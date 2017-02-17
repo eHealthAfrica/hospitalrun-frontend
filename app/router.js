@@ -31,6 +31,7 @@ Router.map(function() {
     this.route('today');
     this.route('missed');
     this.route('calendar');
+    this.route('theater');
   });
 
   this.route('finishgauth', { path: '/finishgauth/:s1/:s2/:k/:t/:i/:p' });
@@ -102,6 +103,13 @@ Router.map(function() {
     }, function() {
       this.route('edit', { path: '/edit/:procedure_id' });
     });
+
+    this.route('reports', {
+      resetNamespace: true
+    }, function() {
+      this.route('edit', { path: '/edit/:report_id' });
+    });
+
   });
 });
 

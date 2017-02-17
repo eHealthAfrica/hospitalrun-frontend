@@ -41,7 +41,7 @@ export default {
     imaging: 'Imaging',
     inventory: 'Inventory',
     patients: 'Patients',
-    appointments: 'Appointments',
+    scheduling: 'Scheduling',
     medication: 'Medication',
     labs: 'Labs',
     billing: 'Billing',
@@ -56,9 +56,9 @@ export default {
       reports: 'Reports',
       patientListing: 'Patient Listing',
       newPatient: 'New Patient',
-      thisWeek: 'This Week',
-      today: 'Today',
-      search: 'Search',
+      appointmentsThisWeek: 'Appointment This Week',
+      "today'sAppointments": 'Today\'s Appointments',
+      appointmentSearch: 'Appointment Search',
       addAppointment: 'Add Appointment',
       dispense: 'Dispense',
       returnMedication: 'Return Medication',
@@ -72,12 +72,14 @@ export default {
       users: 'Users',
       newUser: 'New User',
       admittedPatients: 'Admitted Patients',
-      missed: 'Missed',
+      missedAppointments: 'Missed Appointments',
       userRoles: 'User Roles',
       workflow: 'Workflow',
       outpatient: 'Outpatient',
       customForms: 'Custom Forms',
-      calendar: 'Calendar'
+      appointmentsCalendar: 'Appointments Calendar',
+      theaterSchedule: 'Theater Schedule',
+      scheduleSurgery: 'Schedule Surgery'
     },
     actions: {
       logout: 'Logout',
@@ -144,7 +146,8 @@ export default {
         socialworkFormType: 'Social Work',
         text: 'Text',
         textarea: 'Large Text',
-        visitFormType: 'Visit'
+        visitFormType: 'Visit',
+        opdReportFormType: 'Outpatient Report'
       },
       messages: {
         deleteForm: 'Are you sure you want to delete this custom form?',
@@ -768,14 +771,23 @@ export default {
     todayTitle: 'Today\'s Appointments',
     calendarTitle: 'Appointments Calendar',
     messages: {
+      appointmentSaved: 'The appointment for {{patient}} has been saved.',
       deleteAppointmentMessage: 'Are you sure you wish to delete this appointment?',
       endTimeLaterThanStart: 'Please select an end time later than the start time.'
     },
     buttons: {
-      newButton: '+ new appointment'
+      newButton: '+ new appointment',
+      scheduleSurgery: '+ schedule surgery'
     },
     labels: {
+      noLocation: 'No Location',
       selectedStartingDate: 'Show Appointments On Or After'
+    },
+    titles: {
+      appointmentSaved: 'Appointment Saved',
+      editSurgicalAppointment: 'Edit Surgical Appointment',
+      newSurgicalAppointment: 'New Surgical Appointment',
+      theaterSchedule: 'Theater Schedule'
     }
   },
   vitals: {
@@ -849,14 +861,16 @@ export default {
       statusDischarged: 'Discharged',
       statusCheckedIn: 'Checked In',
       statusCheckedOut: 'Checked Out',
-      createNewPatient: 'Create New Patient'
+      createNewPatient: 'Create New Patient',
+      reportType: 'Report type'
     },
     navigation: {
       charges: 'Charges',
       notes: 'Notes',
       orders: 'Orders',
       procedures: 'Procedures',
-      vitals: 'Vitals'
+      vitals: 'Vitals',
+      reports: 'Reports'
     }
   },
   labs: {
@@ -957,7 +971,10 @@ export default {
       newAppointment: 'New Appointment',
       backToPatients: 'Back to Patient List',
       newPatient: '+ new patient',
-      patientCheckIn: 'Patient Check In'
+      patientCheckIn: 'Patient Check In',
+      newOPDReport: 'New OPD Report',
+      newDischargeReport: 'New Discharge Report',
+      scheduleSurgery: 'Schedule Surgery'
     },
     labels: {
       primaryDiagnosis: 'Primary Diagnoses',
@@ -998,7 +1015,9 @@ export default {
       parent: 'Parent/Guardian',
       contacts: 'Contacts',
       sexNotEntered: 'Sex Not Entered',
-      operativePlan: 'Operative Plan'
+      operativePlan: 'Operative Plan',
+      patientTypeCharity: 'Charity',
+      patientTypePrivate: 'Private'
     },
     notes: {
       newNote: 'New Note for',
@@ -1083,6 +1102,39 @@ export default {
       addMedication: 'Add Medication'
     }
   },
+  reports: {
+    titles: {
+      preview: 'Preview Report',
+      saved: 'The report has been saved'
+    },
+    form: {
+      visitDate: 'Date of Visit',
+      primaryDiagnosis: 'Primary Diagnosis',
+      secondaryDiagnosis: 'Secondary Diagnosis',
+      procedures: 'Procedures',
+      labs: 'Labs',
+      images: 'Images',
+      nextAppointmentDate: 'Date Of Next Appointment',
+      operativePlan: 'Planned Procedures'
+    },
+    opd: {
+      titles: {
+        new: 'New OPD Report',
+        edit: 'Edit OPD Report'
+      }
+    },
+    discharge: {
+      titles: {
+        new: 'New Discharge Report',
+        edit: 'Edit Discharge Report'
+      }
+    },
+    messages: {
+      deleteMedication: 'Are you sure you want to delete this medication?',
+      delete: 'Are you sure you wish to delete this report?',
+      saved: 'The report has been saved.'
+    }
+  },
   components: {
     chargesByTypeTab: {
       charges: 'charges'
@@ -1145,6 +1197,17 @@ export default {
       titles: {
         procedures: 'Procedures'
       }
+    },
+    upcomingAppointments: {
+      labels: {
+        date: 'Date',
+        with: 'With',
+        location: 'Location',
+        type: 'Type'
+      },
+      titles: {
+        upcomingAppointments: 'Upcoming Appointments'
+      }
     }
   },
   customForms: {
@@ -1196,8 +1259,7 @@ export default {
       operationDescription: 'Operation Description',
       plannedStatus: 'Planned',
       status: 'Status',
-      surgeon: 'Surgeon',
-      surgeryDate: 'Surgery Date'
+      surgeon: 'Surgeon'
     },
     messages: {
       planSaved: 'The operative plan has been saved.',
