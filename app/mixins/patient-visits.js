@@ -46,6 +46,18 @@ export default Ember.Mixin.create(PouchDbMixin, {
     return DS.PromiseObject.create({ promise });
   },
 
+  _getVisitCollection(visits, name) {
+    let returnList = [];
+    if (!Ember.isEmpty(visits)) {
+      visits.forEach(function(visit) {
+        visit.get(name).then(function(items) {
+          returnList.addObjects(items);
+        });
+      });
+    }
+    return returnList;
+  },
+
   checkoutVisit(visit, status) {
     visit.set('status', status);
     visit.set('endDate', new Date());

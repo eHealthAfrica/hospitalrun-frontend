@@ -8,13 +8,14 @@ import ReturnTo from 'hospitalrun/mixins/return-to';
 import SelectValues from 'hospitalrun/utils/select-values';
 import UserSession from 'hospitalrun/mixins/user-session';
 import VisitStatus from 'hospitalrun/utils/visit-statuses';
+import PatientVisits from 'hospitalrun/mixins/patient-visits';
 
 const {
   get,
   isEmpty
 } = Ember;
 
-export default AbstractEditController.extend(BloodTypes, DiagnosisActions, ReturnTo, UserSession, PatientId, PatientNotes, {
+export default AbstractEditController.extend(BloodTypes, DiagnosisActions, ReturnTo, UserSession, PatientId, PatientNotes, PatientVisits, {
 
   canAddAppointment: function() {
     return this.currentUserCan('add_appointment');
@@ -144,19 +145,19 @@ export default AbstractEditController.extend(BloodTypes, DiagnosisActions, Retur
   }],
 
   patientImaging: function() {
-    return this._getVisitCollection('imaging');
+    return this.getVisitCollection('imaging');
   }.property('model.visits.[].imaging'),
 
   patientLabs: function() {
-    return this._getVisitCollection('labs');
+    return this.getVisitCollection('labs');
   }.property('model.visits.[].labs'),
 
   patientMedications: function() {
-    return this._getVisitCollection('medication');
+    return this.getVisitCollection('medication');
   }.property('model.visits.[].medication'),
 
   patientProcedures: function() {
-    let patientProcedures = this._getVisitCollection('procedures');
+    let patientProcedures = this.getVisitCollection('procedures');
     let operationReports = get(this, 'model.operationReports');
     operationReports.forEach((report) => {
       let reportedProcedures = get(report, 'procedures');
@@ -570,17 +571,9 @@ export default AbstractEditController.extend(BloodTypes, DiagnosisActions, Retur
     this.send('openModal', `patients.socialwork.${route}`, model);
   },
 
-  _getVisitCollection(name) {
-    let returnList = [];
+  getVisitCollection(name) {
     let visits = this.get('model.visits');
-    if (!Ember.isEmpty(visits)) {
-      visits.forEach(function(visit) {
-        visit.get(name).then(function(items) {
-          returnList.addObjects(items);
-        });
-      });
-    }
-    return returnList;
+    return this._getVisitCollection(visits, name);
   },
 
   _updateSocialRecord(recordToUpdate, name) {
