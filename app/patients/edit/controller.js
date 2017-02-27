@@ -157,20 +157,9 @@ export default AbstractEditController.extend(BloodTypes, DiagnosisActions, Retur
   }.property('model.visits.[].medication'),
 
   patientProcedures: function() {
-    let patientProcedures = this.getVisitCollection('procedures');
+    let visits = this.get('model.visits');
     let operationReports = get(this, 'model.operationReports');
-    operationReports.forEach((report) => {
-      let reportedProcedures = get(report, 'procedures');
-      let surgeryDate = get(report, 'surgeryDate');
-      reportedProcedures.forEach((procedure) => {
-        patientProcedures.addObject({
-          description: get(procedure, 'description'),
-          procedureDate: surgeryDate,
-          report
-        });
-      });
-    });
-    return patientProcedures;
+    return this._getPatientProcedures(operationReports, visits);
   }.property('model.visits.[].procedures', 'model.operationReports.[].procedures'),
 
   showExpenseTotal: function() {
