@@ -1110,21 +1110,28 @@ export default {
     },
     form: {
       visitDate: 'Date of Visit',
-      dischargeDate: 'Date of Discharge',
-      notes: 'Notes',
+      admissionDate: 'Admission Date',
+      dischargeDate: 'Discharge Date',
+      notes: {
+        title: 'Notes',
+        date: 'Date',
+        author: 'Author'
+      },
       primaryDiagnosis: 'Primary Diagnosis',
       secondaryDiagnosis: 'Secondary Diagnosis',
       procedures: 'Procedures',
+      allProcedures: 'All Procedures Performed',
       labs: 'Labs',
       images: 'Images',
       medications: 'Medications',
       nextAppointmentDate: 'Date Of Next Appointment',
       operativePlan: {
-        title: 'Operative Plans',
+        title: 'Operative Plan',
         description: 'Operation Description',
         procedures: 'Planned Procedures',
         instructions: 'Instructions upon Admission'
-      }
+      },
+      completedBy: 'Completed By'
     },
     opd: {
       titles: {

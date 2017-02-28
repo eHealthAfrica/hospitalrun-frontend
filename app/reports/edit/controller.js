@@ -3,9 +3,9 @@ import Ember from 'ember';
 import PatientSubmodule from 'hospitalrun/mixins/patient-submodule';
 import PatientDiagnosis from 'hospitalrun/mixins/patient-diagnosis';
 import PouchDbMixin from 'hospitalrun/mixins/pouchdb';
-import PatientVisit from 'hospitalrun/mixins/patient-visits';
+import PatientVisits from 'hospitalrun/mixins/patient-visits';
 
-export default AbstractEditController.extend(PatientSubmodule, PatientDiagnosis, PouchDbMixin, PatientVisit, {
+export default AbstractEditController.extend(PatientVisits, PatientSubmodule, PatientDiagnosis, PouchDbMixin, {
   lookupListsToUpdate: [{
     name: 'physicianList',
     property: 'model.surgeon',
@@ -25,9 +25,36 @@ export default AbstractEditController.extend(PatientSubmodule, PatientDiagnosis,
   headerLine3: Ember.computed.alias('visitsController.printHeader.value.headerLine3'),
 
   diagnosisList: Ember.computed.alias('visitsController.diagnosisList'),
+  diagnosisContainer: Ember.computed('model.visit', function() {
+    let visit = this.get('model.visit');
+    let isOutPatient = visit.get('outPatient');
+    if (isOutPatient) {
+      return visit;
+    }
+    return null;
+  }),
 
   nextAppointment: Ember.computed('model', function() {
     return this.getPatientFutureAppointment(this.get('model.visit'));
+  }),
+
+  patientProcedures: Ember.computed('model', function() {
+    let isOutpatient = this.get('model.visit.outPatient');
+    if (!isOutpatient) {
+      let patient = this.get('model.visit.patient');
+      let visits = patient.get('visits');
+      let operationReports = patient.get('operationReports');
+      return this._getPatientProcedures(operationReports, visits);
+    }
+  }),
+
+  currentOperativePlan: Ember.computed('model', function() {
+    let operativePlans = this.get('model.visit.patient.operativePlans');
+    return operativePlans.findBy('isPlanned', true);
+  }),
+
+  currentUser: Ember.computed('model', function() {
+    return this.get('model').getUserName();
   }),
 
   additionalButtons: Ember.computed('model.{isNew}', function() {
