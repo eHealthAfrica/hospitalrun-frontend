@@ -15,8 +15,8 @@
     <span>{{headerLine3}}</span><br>
   {{/if}}
 </div>
-  <div class="opd-report">
-    {{#edit-panel editPanelProps=editPanelProps}}
+<div class="report">
+  {{#edit-panel editPanelProps=editPanelProps}}
     {{#em-form model=model submitButton=false }}
       {{#if model.visit}}
         {{patient-summary
@@ -24,43 +24,68 @@
           returnTo='visit.edit'
           returnToContext=model.id
           disablePatientLink=model.isNew
-          diagnosisContainer=model.visit
+          diagnosisContainer=diagnosisContainer
           diagnosisList=diagnosisList
         }}
       {{/if}}
 
       {{#if model.visit.startDate}}
         <div class="ps-info-group">
-          <label class="ps-info-label">{{t 'reports.form.visitDate' }}</label>
-          {{date-format model.visit.startDate format="DD/MM/YYYY hh:mm a"}}
+          <label class="ps-info-label">
+            {{#if model.visit.outPatient}}
+              {{t 'reports.form.visitDate' }}:
+            {{else}}
+              {{t 'reports.form.admissionDate' }}:
+            {{/if}}
+          </label>
+          {{date-format model.visit.startDate format="DD/MM/YYYY"}}
         </div>
       {{/if}}
 
       {{#unless model.visit.outPatient}}
         <div class="ps-info-group">
-          <p class="ps-info-label">{{t 'reports.form.dischargeDate' }}</p>
-          {{date-format model.reportDate format="DD/MM/YYYY hh:mm a"}}
+          <label class="ps-info-label">{{t 'reports.form.dischargeDate' }}: </label>
+          {{date-format model.reportDate format="DD/MM/YYYY"}}
         </div>
       {{/unless}}
 
       {{#unless model.visit.outPatient}}
         <div class="row">
           {{select-or-typeahead className="col-sm-4" property="surgeon"
-           label=(t "operativePlan.labels.surgeon") list=physicianList
-           selection=model.surgeon
-           class="plan-surgeon"
+                                label=(t "operativePlan.labels.surgeon") list=physicianList
+                                selection=model.surgeon
+                                class="plan-surgeon"
           }}
         </div>
       {{/unless}}
 
       {{#unless model.visit.outPatient}}
-        {{#if model.visit.notes}}
-          <div class="ps-info-group">
-            <label class="ps-info-label">{{t 'reports.form.notes' }}</label>
-            <ul>
-                <li>{{model.visit.notes}}</li>
-            </ul>
-          </div>
+        {{#if patientProcedures}}
+          <label class="ps-info-label">{{t 'reports.form.allProcedures'}}</label>
+          <ul>
+            {{#each patientProcedures as |procedure|}}
+              <li>{{procedure.description}} -
+                {{#if procedure.procedureDate }}
+                  {{date-format procedure.procedureDate format="DD/MM/YYYY"}}
+                {{/if}}</li>
+            {{/each}}
+          </ul>
+        {{/if}}
+
+      {{/unless}}
+
+      {{#unless model.visit.outPatient}}
+        {{#if model.visit.patientNotes}}
+          <label class="ps-info-label">{{t 'reports.form.notes.title' }}</label>
+          <ul>
+            {{#each model.visit.patientNotes as |note|}}
+              <li>
+                <b>{{t 'reports.form.notes.date' }}:</b> {{date-format note.date}}<br>
+                <b>{{t 'reports.form.notes.author' }}:</b> {{note.authoredBy}}<br>
+                <b>{{note.noteType}}: {{note.content}}</b>
+              </li>
+            {{/each}}
+          </ul>
         {{/if}}
       {{/unless}}
 
@@ -111,37 +136,37 @@
       {{#if nextAppointment}}
         <div class="ps-info-group">
           <label class="ps-info-label">{{t 'reports.form.nextAppointmentDate' }}:</label>
-         {{date-format nextAppointment format="DD/MM/YYYY hh:mm a"}}
+          {{date-format nextAppointment format="DD/MM/YYYY hh:mm a"}}
         </div>
       {{/if}}
 
-      {{#if model.visit.patient.operativePlans.length}}
-        <div class="ps-info-group">
-          <label class="ps-info-label">{{t 'reports.form.operativePlan.title' }}</label>
-          <ul>
-              {{#each model.visit.patient.operativePlans as |operativePlan|}}
-                <li>
-                  <p><b>{{t 'reports.form.operativePlan.description' }}:</b><br>
-                  {{operativePlan.operationDescription}}</p>
-                </li>
+      {{#if model.visit.outPatient}}
+        {{#if currentOperativePlan}}
+          <div class="ps-info-group">
+            <label class="ps-info-label">{{t 'reports.form.operativePlan.title' }}</label>
+            <ul>
+              <li>
+                <p><b>{{t 'reports.form.operativePlan.description' }}:</b><br>
+                  {{currentOperativePlan.operationDescription}}</p>
+              </li>
 
-                <li>
-                  <p><b>{{t 'reports.form.operativePlan.procedures' }}:</b></p>
-                  <ul>
-                    {{#each operativePlan.procedures as |procedure|}}
-                      <li>{{procedure.description}}</li>
-                    {{/each}}
-                  </ul>
-                </li>
+              <li>
+                <p><b>{{t 'reports.form.operativePlan.procedures' }}:</b></p>
+                <ul>
+                  {{#each currentOperativePlan.procedures as |procedure|}}
+                    <li>{{procedure.description}}</li>
+                  {{/each}}
+                </ul>
+              </li>
 
-                <li>
-                  <p><b>{{t 'reports.form.operativePlan.instructions' }}:</b><br>
-                    {{operativePlan.admissionInstructions}}
-                  </p>
-                </li>
-              {{/each}}
-          </ul>
-        </div>
+              <li>
+                <p><b>{{t 'reports.form.operativePlan.instructions' }}:</b><br>
+                  {{currentOperativePlan.admissionInstructions}}
+                </p>
+              </li>
+            </ul>
+          </div>
+        {{/if}}
       {{/if}}
 
       {{#if model.visit.outPatient}}
@@ -150,8 +175,13 @@
         {{custom-form-manager model=model formType="dischargeReport"}}
       {{/if}}
 
-
+      {{#unless model.visit.outPatient}}
+        <div class="ps-info-group">
+          <label class="ps-info-label">{{t 'reports.form.completedBy' }}:</label>
+          {{completedBy}}
+        </div>
+      {{/unless}}
 
     {{/em-form}}
   {{/edit-panel}}
-  </div>
+</div>

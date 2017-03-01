@@ -4,7 +4,8 @@ import VisitStatus from 'hospitalrun/utils/visit-statuses';
 import DS from 'ember-data';
 import moment from 'moment';
 const {
-  isEmpty
+  isEmpty,
+  get
 } = Ember;
 
 export default Ember.Mixin.create(PouchDbMixin, {
@@ -44,6 +45,34 @@ export default Ember.Mixin.create(PouchDbMixin, {
       return res;
     });
     return DS.PromiseObject.create({ promise });
+  },
+
+  _getVisitCollection(visits, name) {
+    let returnList = [];
+    if (!Ember.isEmpty(visits)) {
+      visits.forEach(function(visit) {
+        visit.get(name).then(function(items) {
+          returnList.addObjects(items);
+        });
+      });
+    }
+    return returnList;
+  },
+
+  _getPatientProcedures(operationReports, visits) {
+    let patientProcedures = this._getVisitCollection(visits, 'procedures');
+    operationReports.forEach((report) => {
+      let reportedProcedures = get(report, 'procedures');
+      let surgeryDate = get(report, 'surgeryDate');
+      reportedProcedures.forEach((procedure) => {
+        patientProcedures.addObject({
+          description: get(procedure, 'description'),
+          procedureDate: surgeryDate,
+          report
+        });
+      });
+    });
+    return patientProcedures;
   },
 
   checkoutVisit(visit, status) {
