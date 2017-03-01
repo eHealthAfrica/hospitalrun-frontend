@@ -3,9 +3,8 @@ import Ember from 'ember';
 import PatientSubmodule from 'hospitalrun/mixins/patient-submodule';
 import PatientDiagnosis from 'hospitalrun/mixins/patient-diagnosis';
 import PouchDbMixin from 'hospitalrun/mixins/pouchdb';
-import PatientVisits from 'hospitalrun/mixins/patient-visits';
 
-export default AbstractEditController.extend(PatientVisits, PatientSubmodule, PatientDiagnosis, PouchDbMixin, {
+export default AbstractEditController.extend(PatientSubmodule, PatientDiagnosis, PouchDbMixin, {
   lookupListsToUpdate: [{
     name: 'physicianList',
     property: 'model.surgeon',
@@ -38,23 +37,13 @@ export default AbstractEditController.extend(PatientVisits, PatientSubmodule, Pa
     return this.getPatientFutureAppointment(this.get('model.visit'));
   }),
 
-  patientProcedures: Ember.computed('model', function() {
-    let isOutpatient = this.get('model.visit.outPatient');
-    if (!isOutpatient) {
-      let patient = this.get('model.visit.patient');
-      let visits = patient.get('visits');
-      let operationReports = patient.get('operationReports');
-      return this._getPatientProcedures(operationReports, visits);
-    }
-  }),
-
   currentOperativePlan: Ember.computed('model', function() {
     let operativePlans = this.get('model.visit.patient.operativePlans');
     return operativePlans.findBy('isPlanned', true);
   }),
 
-  currentUser: Ember.computed('model', function() {
-    return this.get('model').getUserName();
+  completedBy: Ember.computed('model', function() {
+    return this.get('model.modifiedBy');
   }),
 
   additionalButtons: Ember.computed('model.{isNew}', function() {
