@@ -1,6 +1,6 @@
 {
   "name": "@ehealth-ci/hospitalrun",
-  "version": "0.9.19",
+  "version": "0.9.21",
   "description": "Ember front end for HospitalRun",
   "homepage": "http://hospitalrun.io",
   "directories": {
