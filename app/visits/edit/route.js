@@ -44,10 +44,6 @@ export default AbstractEditRoute.extend(ChargeRoute, PatientListRoute, PatientVi
     }
   },
 
-  report: function() {
-
-  }.property('model'),
-
   setupController(controller, model) {
     let promise = this.store.query('report', {
       options: {
@@ -59,7 +55,6 @@ export default AbstractEditRoute.extend(ChargeRoute, PatientListRoute, PatientVi
       return Ember.isEmpty(reports) ? '' : reports.get('firstObject');
     });
     controller.set('report', DS.PromiseObject.create({ promise }));
-    controller.set('nextAppointment', this.getPatientFutureAppointment(model));
     this._super(controller, model);
   },
 

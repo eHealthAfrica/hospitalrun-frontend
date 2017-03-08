@@ -3,9 +3,8 @@ import Ember from 'ember';
 import PatientSubmodule from 'hospitalrun/mixins/patient-submodule';
 import PatientDiagnosis from 'hospitalrun/mixins/patient-diagnosis';
 import PouchDbMixin from 'hospitalrun/mixins/pouchdb';
-import PatientVisit from 'hospitalrun/mixins/patient-visits';
 
-export default AbstractEditController.extend(PatientSubmodule, PatientDiagnosis, PouchDbMixin, PatientVisit, {
+export default AbstractEditController.extend(PatientSubmodule, PatientDiagnosis, PouchDbMixin, {
   lookupListsToUpdate: [{
     name: 'physicianList',
     property: 'model.surgeon',
@@ -26,10 +25,6 @@ export default AbstractEditController.extend(PatientSubmodule, PatientDiagnosis,
 
   diagnosisList: Ember.computed.alias('visitsController.diagnosisList'),
 
-  nextAppointment: Ember.computed('model', function() {
-    return this.getPatientFutureAppointment(this.get('model.visit'));
-  }),
-
   additionalButtons: Ember.computed('model.{isNew}', function() {
     let isNew = this.get('model.isNew');
     if (!isNew) {
@@ -47,8 +42,6 @@ export default AbstractEditController.extend(PatientSubmodule, PatientDiagnosis,
   beforeUpdate() {
     return new Ember.RSVP.Promise(function(resolve) {
       if (this.get('model.isNew')) {
-        let appointmentDate = this.get('nextAppointment').get('content');
-        this.get('model').set('nextAppointment', appointmentDate);
         if (this.get('model.visit.outPatient')) {
           this.get('model').set('reportType', 'OPD Report');
         } else {
