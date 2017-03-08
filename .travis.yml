@@ -23,15 +23,15 @@ deploy:
   on:
     tags: true
     repo: eHealthAfrica/hospitalrun-frontend
-    branch: master
-  on:
-    tags: true
-    repo: eHealthAfrica/hospitalrun-frontend
     branch: develop
   on:
     tags: true
     repo: eHealthAfrica/hospitalrun-frontend
     branch: stage
+  on:
+    tags: true
+    repo: eHealthAfrica/hospitalrun-frontend
+    branch: master
   on:
     tags: true
     repo: eHealthAfrica/hospitalrun-frontend
