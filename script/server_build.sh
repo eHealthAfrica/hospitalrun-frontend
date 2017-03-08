@@ -1,10 +1,7 @@
 #!/usr/bin/env bash
-
-BRANCH="${TRAVIS_BRANCH}"
-
 body='{
 "request": {
-  "branch":"${BRANCH}"
+  "branch":"${TRAVIS_BRANCH}"
 }}'
 
 curl -s -X POST \
