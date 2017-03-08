@@ -17,21 +17,18 @@ install:
 script:
 - npm test
 deploy:
-  - npm run ci-publish
+  provider: script
+  script: npm-deploy.sh
   on:
-    tags: true
     repo: eHealthAfrica/hospitalrun-frontend
     branch: develop
   on:
-    tags: true
     repo: eHealthAfrica/hospitalrun-frontend
     branch: stage
   on:
-    tags: true
     repo: eHealthAfrica/hospitalrun-frontend
     branch: master
   on:
-    tags: true
     repo: eHealthAfrica/hospitalrun-frontend
     branch: eHA/Polyclinic
 
