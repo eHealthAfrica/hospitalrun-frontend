@@ -3,8 +3,10 @@ import AbstractEditRoute from 'hospitalrun/routes/abstract-edit-route';
 import ChargeRoute from 'hospitalrun/mixins/charge-route';
 import Ember from 'ember';
 import PatientListRoute from 'hospitalrun/mixins/patient-list-route';
+import PatientVisit from 'hospitalrun/mixins/patient-visits';
+import DS from 'ember-data';
 
-export default AbstractEditRoute.extend(ChargeRoute, PatientListRoute, {
+export default AbstractEditRoute.extend(ChargeRoute, PatientListRoute, PatientVisit, {
   customForms: Ember.inject.service(),
   editTitle: t('visits.titles.editVisit'),
   modelName: 'visit',
@@ -40,6 +42,20 @@ export default AbstractEditRoute.extend(ChargeRoute, PatientListRoute, {
     } else {
       return this._super(model);
     }
+  },
+
+  setupController(controller, model) {
+    let promise = this.store.query('report', {
+      options: {
+        key: model.get('id')
+      },
+      mapReduce: 'report_by_visit'
+    }).then((reports) => {
+      controller.set('noReport', Ember.isEmpty(reports));
+      return Ember.isEmpty(reports) ? '' : reports.get('firstObject');
+    });
+    controller.set('report', DS.PromiseObject.create({ promise }));
+    this._super(controller, model);
   },
 
   actions: {

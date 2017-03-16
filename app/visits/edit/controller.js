@@ -36,7 +36,7 @@ export default AbstractEditController.extend(AddNewPatient, ChargeActions, Diagn
       return [buttonProps];
     }
   }),
-
+  noReport: false,
   canAddAppointment: computed('model.isNew', function() {
     return (!this.get('model.isNew') && this.currentUserCan('add_appointment'));
   }),
@@ -65,6 +65,10 @@ export default AbstractEditController.extend(AddNewPatient, ChargeActions, Diagn
     return this.currentUserCan('add_vitals');
   }.property(),
 
+  canAddReport: function() {
+    return this.currentUserCan('add_report') && !this.get('hasReport');
+  }.property('hasReport'),
+
   canDeleteImaging: function() {
     return this.currentUserCan('delete_imaging');
   }.property(),
@@ -83,6 +87,10 @@ export default AbstractEditController.extend(AddNewPatient, ChargeActions, Diagn
 
   canDeleteVitals: function() {
     return this.currentUserCan('delete_vitals');
+  }.property(),
+
+  canDeleteReport: function() {
+    return this.currentUserCan('delete_report');
   }.property(),
 
   isAdmissionVisit: function() {
@@ -162,17 +170,16 @@ export default AbstractEditController.extend(AddNewPatient, ChargeActions, Diagn
   }.property('visitTypes', 'model.outPatient'),
 
   _addChildObject(route, afterTransition) {
-    this.transitionToRoute(route, 'new').then(function(newRoute) {
-      newRoute.currentModel.setProperties({
-        patient: this.get('model.patient'),
-        visit: this.get('model'),
-        selectPatient: false,
-        returnToVisit: this.get('model.id')
-      });
+    let options = {
+      queryParams: {
+        forVisitId: this.get('model.id')
+      }
+    };
+    this.transitionToRoute(route, 'new', options).then((newRoute) => {
       if (afterTransition) {
         afterTransition(newRoute);
       }
-    }.bind(this));
+    });
   },
 
   _finishAfterUpdate() {
@@ -267,14 +274,19 @@ export default AbstractEditController.extend(AddNewPatient, ChargeActions, Diagn
                 message: 'creating new patient first'
               });
             }
+            let outPatient = false;
             let visitType = newVisit.get('visitType');
             let visitStatus;
             if (visitType === 'Admission') {
               visitStatus = VisitStatus.ADMITTED;
             } else {
+              outPatient = true;
               visitStatus = VisitStatus.CHECKED_IN;
             }
-            newVisit.set('status', visitStatus);
+            newVisit.setProperties({
+              outPatient,
+              status: visitStatus
+            });
             if (this.get('model.checkIn')) {
               this._saveAssociatedAppointment(newVisit).then(() => {
                 this.saveNewDiagnoses().then(resolve, reject);
@@ -393,6 +405,11 @@ export default AbstractEditController.extend(AddNewPatient, ChargeActions, Diagn
       }
     },
 
+    editReport(report) {
+      report.set('returnToVisit', this.get('model.id'));
+      this.transitionToRoute('reports.edit', report);
+    },
+
     newPatientChanged(createNewPatient) {
       set(this, 'model.createNewPatient', createNewPatient);
       let model = this.get('model');
@@ -436,6 +453,10 @@ export default AbstractEditController.extend(AddNewPatient, ChargeActions, Diagn
 
     newMedication() {
       this._addChildObject('medication.edit');
+    },
+
+    newReport() {
+      this._addChildObject('reports.edit');
     },
 
     showAddProcedure() {

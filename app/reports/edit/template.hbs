@@ -1,0 +1,202 @@
+<div class="report-header">
+  {{#if logoURL}}
+    <img src={{logoURL}} class="report-logo">
+  {{/if}}
+  {{#if facilityName }}
+    <h3>{{facilityName}}</h3>
+  {{/if}}
+  {{#if headerLine1}}
+    <span>{{headerLine1}}</span><br>
+  {{/if}}
+  {{#if headerLine2}}
+    <span>{{headerLine2}}</span><br>
+  {{/if}}
+  {{#if headerLine3}}
+    <span>{{headerLine3}}</span><br>
+  {{/if}}
+  {{#if isOutPatient}}
+    <h3>{{t 'reports.titles.opdTitle' }}</h3>
+  {{else}}
+    <h3>{{t 'reports.titles.dischargeReport' }}</h3>
+  {{/if}}
+</div>
+<div class="report">
+  {{#edit-panel editPanelProps=editPanelProps}}
+    {{#em-form model=model submitButton=false }}
+      {{#if model.patient}}
+        {{patient-summary
+          patient=model.patient
+          disablePatientLink=true
+          diagnosisContainer=diagnosisContainer
+          diagnosisList=diagnosisList
+        }}
+      {{/if}}
+
+      <div class="ps-info-group">
+        <label class="ps-info-label">
+          {{#if isOutPatient}}
+            {{t 'reports.form.visitDate' }}:
+          {{else}}
+            {{t 'reports.form.admissionDate' }}:
+          {{/if}}
+        </label>
+        {{date-format visit.startDate format="DD/MM/YYYY"}}
+      </div>
+
+      {{#if isOutPatient}}
+
+        {{#if visit.procedures}}
+          <div class="ps-info-group">
+            <label class="ps-info-label">{{t 'reports.form.procedures' }}</label>
+            <ul>
+              {{#each visit.procedures as |item|}}
+                <li>{{item.description}}</li>
+              {{/each}}
+            </ul>
+          </div>
+        {{/if}}
+
+        {{#if visit.labs}}
+          <div class="ps-info-group">
+            <label class="ps-info-label">{{t 'reports.form.labs' }}</label>
+            <ul>
+              {{#each visit.labs as |item|}}
+                <li>{{item.labType.name}}-{{item.result}} ({{item.status}})</li>
+              {{/each}}
+            </ul>
+          </div>
+        {{/if}}
+
+        {{#if visit.imaging}}
+          <div class="ps-info-group">
+            <label class="ps-info-label">{{t 'reports.form.images' }}</label>
+            <ul>
+              {{#each visit.imaging as |item|}}
+                <li>{{item.imagingType.name}}-{{item.result}} ({{item.status}})</li>
+              {{/each}}
+            </ul>
+          </div>
+        {{/if}}
+
+        {{#if visit.medication}}
+          <div class="ps-info-group">
+            <label class="ps-info-label">{{t 'reports.form.medications' }}</label>
+            <ul>
+              {{#each visit.medication as |medication|}}
+                <li>{{medication.medicationName}} - {{medication.prescription}} ({{medication.status}})</li>
+              {{/each}}
+            </ul>
+          </div>
+        {{/if}}
+
+        {{#if nextAppointments}}
+          <div class="ps-info-group">
+            <label class="ps-info-label">{{t 'reports.form.nextAppointments' }}</label>
+            <ul>
+              {{#each nextAppointments as |appointment|}}
+                <li>
+                  {{date-format appointment.startDate format="DD/MM/YYYY hh:mm a"}}
+                  {{#if appointment.appointmentType}}
+                    (<b>{{appointment.appointmentType}}</b>)
+                  {{/if}}
+                </li>
+              {{/each}}
+            </ul>
+          </div>
+        {{/if}}
+
+        {{#if currentOperativePlan}}
+          <div class="ps-info-group">
+            <label class="ps-info-label">{{t 'reports.form.operativePlan.title' }}</label>
+            <ul>
+              {{#if currentOperativePlan.operationDescription}}
+                <li>
+                  <p><b>{{t 'reports.form.operativePlan.description' }}:</b><br>
+                    {{currentOperativePlan.operationDescription}}</p>
+                </li>
+              {{/if}}
+
+              <li>
+                <p><b>{{t 'reports.form.operativePlan.procedures' }}:</b></p>
+                <ul>
+                  {{#each currentOperativePlan.procedures as |procedure|}}
+                    <li>{{procedure.description}}</li>
+                  {{/each}}
+                </ul>
+              </li>
+
+              {{#if currentOperativePlan.admissionInstructions}}
+                <li>
+                  <p><b>{{t 'reports.form.operativePlan.instructions' }}:</b><br>
+                    {{currentOperativePlan.admissionInstructions}}</p>
+                </li>
+              {{/if}}
+            </ul>
+          </div>
+        {{/if}}
+
+        {{custom-form-manager model=model formType="opdReport"}}
+
+      {{else}}
+
+        <div class="ps-info-group">
+          <label class="ps-info-label">{{t 'reports.form.dischargeDate' }}: </label>
+          {{date-format model.reportDate format="DD/MM/YYYY"}}
+        </div>
+
+        <div class="row">
+          {{select-or-typeahead className="col-sm-4" property="surgeon"
+                                label=(t "operativePlan.labels.surgeon") list=physicianList
+                                selection=model.surgeon
+                                class="plan-surgeon"
+          }}
+        </div>
+
+        {{#if patientProcedures}}
+          <label class="ps-info-label">{{t 'reports.form.allProcedures'}}</label>
+          <ul>
+            {{#each patientProcedures as |procedure|}}
+              <li>{{procedure.description}} -
+                {{#if procedure.procedureDate }}
+                  {{date-format procedure.procedureDate format="DD/MM/YYYY"}}
+                {{/if}}</li>
+            {{/each}}
+          </ul>
+        {{/if}}
+
+        {{#if visit.patientNotes}}
+          <label class="ps-info-label">{{t 'reports.form.notes.title' }}</label>
+          <ul>
+            {{#each visit.patientNotes as |note|}}
+              <li>
+                <b>{{t 'reports.form.notes.date' }}:</b> {{date-format note.date}}<br>
+                <b>{{t 'reports.form.notes.author' }}:</b> {{note.authoredBy}}<br>
+                <b>{{note.noteType}}: {{note.content}}</b>
+              </li>
+            {{/each}}
+          </ul>
+        {{/if}}
+
+        {{#if nextAppointment}}
+          <div class="ps-info-group">
+            <label class="ps-info-label">{{t 'reports.form.nextAppointment' }}:</label>
+            {{date-format nextAppointment.startDate format="DD/MM/YYYY hh:mm a"}}
+            {{#if nextAppointment.location}}
+              ({{nextAppointment.location}})
+            {{/if}}
+          </div>
+        {{/if}}
+
+        {{custom-form-manager model=model formType="dischargeReport"}}
+
+        {{#if model.modifiedBy}}
+          <div class="ps-info-group">
+            <label class="ps-info-label">{{t 'reports.form.completedBy' }}:</label>
+            {{model.modifiedBy}}
+          </div>
+        {{/if}}
+
+      {{/if}}
+    {{/em-form}}
+  {{/edit-panel}}
+</div>
