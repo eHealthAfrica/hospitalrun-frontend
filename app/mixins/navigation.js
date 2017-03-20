@@ -1,13 +1,14 @@
 import Ember from 'ember';
 
 const { camelize } = Ember.String;
+const { isEqual } = Ember;
 
 export default Ember.Mixin.create({
   navItems: [
     {
       title: 'Inventory',
       iconClass: 'octicon-package',
-      route: 'inventory',
+      route: 'inventory.index',
       capability: 'inventory',
       subnav: [
         {
@@ -40,13 +41,13 @@ export default Ember.Mixin.create({
     {
       title: 'Patients',
       iconClass: 'octicon-organization',
-      route: 'patients',
+      route: 'patients.index',
       capability: 'patients',
       subnav: [
         {
           title: 'Patient Listing',
           iconClass: 'octicon-chevron-right',
-          route: 'patients',
+          route: 'patients.index',
           capability: 'patients'
         },
         {
@@ -386,5 +387,20 @@ export default Ember.Mixin.create({
 
       return nav;
     });
-  })
+  }),
+
+  findNavItemByRoute(route) {
+    for (let i = 0; i < this.navItems.length; i++) {
+      if (isEqual(this.navItems[i].route, route)) {
+        return this.navItems[i];
+      } else {
+        for (let j = 0; j < this.navItems[i].subnav.length; j++) {
+          if (isEqual(this.navItems[i].subnav[j].route, route)) {
+            return this.navItems[i].subnav[j];
+          }
+        }
+      }
+    }
+    return null;
+  }
 });
